@@ -1,3 +1,9 @@
+> **Revisão 2026-11-27 (Conselho do TIME DE JOGOS) — veredito: SEGUIR COM AJUSTES, próximo da fila depois da Camada 0 do Rune Relay.** Ata: [`conselho/2026-11-27-revisao-gdd.md`](conselho/2026-11-27-revisao-gdd.md); visão do portfólio: `JOGOS NOVOS/00_PESQUISA/CONSELHO_PORTFOLIO_2026-11-27.md`.
+> 1. É o GDD mais pronto para construir do portfólio: core, curva dos 10 níveis, economia, tour e exploits já estão escritos. O que falta é provar o core com gente.
+> 2. **Gate 0 de 5 dias-dev:** núcleo C# (fila de 3 + doca de 3 + solver com doca + gerador por partição) com `dotnet test`, greybox procedural no Unity e **build WebGL para a Camada 0** por link, sem esperar a Play Console (§29).
+> 3. **Os 6 conflitos da seção de lições foram resolvidos** conforme as recomendações dela (§29.3).
+> 4. **Nome:** continua obrigatório trocar antes do projeto Unity; 3 candidatos, ainda não verificados, no §29.4. Decisão do Vinicius.
+
 > **Revisão 2026-10-09 (comparativo de mercado):** o Skyhold Cargo foi comparado com 8 similares reais de 2025–2026 (tabela, matriz de recursos, reclamações e fontes em [`COMPETITIVO.md`](COMPETITIVO.md)). O que mudou neste GDD:
 > 1. **Core re-especificado (§2.1):** vista de cima, porão com a silhueta do avião, **fila visível de 3 cargas** e **doca de espera de 3 vagas**; carga encaixada trava; perde quando a doca está cheia e a carga da frente não cabe. Isso cria a falha que faltava (antes o jogador ficava travado, não derrotado) e dá gatilho ao rewarded.
 > 2. **Regras cortadas (§2, §3):** de 7 propriedades por carga para **1 no MVP** (cor de destino = zona da porta). Peso vira **selo opcional de voo estável** (o avião inclina na decolagem), nunca falha. Frágil, temperatura, perigo e orientação saem do MVP: não leem em 3 s e pediam vista lateral com gravidade.
@@ -654,3 +660,59 @@ Esta seção só aponta os conflitos; as seções acima no GDD não foram editad
 6. Tour com os 12 passos acima, cartão do 1º cliente e diário CSV.
 7. Camada 0 (10–20 pessoas). Só depois, as cargas pintadas (0 crédito) e o Diário de Bordo.
 8. Em paralelo, na conta da V-STACK: política de privacidade e chave de upload deste jogo, com backup.
+
+
+---
+
+# 29. REVISÃO DO CONSELHO E PLANO A PARTIR DE 2026-11-27
+
+## 29.1 Por que este é o próximo
+
+- Puzzle é o único gênero do portfólio sem jogo pronto para loja (DC é ação; Forge Street e Little Terminal são idle/tycoon).
+- O risco técnico é pequeno e conhecido: o solver com doca e o arrasto com snap (§23). Todo o resto vem do Rune Relay e do DC.
+- Ele **não** começa antes da Camada 0 do Rune Relay: as duas leituras juntas dizem se o nosso público de puzzle aceita "planejar antes de agir" (Rune Relay) e "guardar ou encaixar" (Skyhold).
+
+## 29.2 Gate 0 (5 dias-dev, cada dia fecha com o portão verde)
+
+| Dia | Entrega | Critério de pronto |
+|---|---|---|
+| 1 | Esqueleto copiado do DC + LT (prefixo `SC`, Unity **6000.3.27f1**), `nucleo.yml`, `HoldGrid` em bitmask `ulong` | `dotnet test` verde no CI |
+| 2 | `Session` (fila de 3, doca de 3, trava, falha, estrelas com contador persistente) + os 5 exploits do §6.1 como testes nomeados, cada um visto vermelho | 5 testes negativos verdes |
+| 3 | Solver DFS com memória sobre (ocupação, índice da fila, doca) e gerador por partição; portão de conteúdo recusa contrato insolúvel, trivial ou que a gulosa resolve | níveis 1–10 do §3 gerados e provados |
+| 4 | Greybox procedural (`Art.cs` do DC): arrasto com a peça 1,5 célula acima do dedo, giro no toque, doca, porta colorida | fotos 540×960 de cada tela conferidas |
+| 5 | Bot com 2 políticas (`-autoplay 30`), diário CSV com "Copiar diário", tour com os passos 0–8, build WebGL no Cloudflare Pages | falha do bot por nível dentro da coluna "Falha-alvo" do §3 |
+
+Depois do dia 5: Camada 0 com 15–20 pessoas, pelo portão do §15.1 (≥ 50% terminam o contrato 10; ≥ 30% falham nos contratos 9–10; refuta com > 25% sem usar a doca sozinhos nos contratos 4–5).
+
+**Decisão técnica:** o protótipo **não** é feito em Vite/TypeScript. O núcleo nasce em C#, que é o que vai para o produto, e o WebGL sai do mesmo projeto. Um protótipo web à parte seria código jogado fora. *Desempate: técnica → technical-director.*
+
+**Arte do Gate 0: 0 crédito.** Cargas como blocos coloridos com o símbolo da porta; o objeto pintado (§27 S3) só depois da Camada 0.
+
+## 29.3 Conflitos da seção de lições, resolvidos
+
+| Onde | Decisão |
+|---|---|
+| §3 "mão fantasma" | vira parte do tour (tabela da seção de lições); a curva da revisão do §3 é a que vale |
+| §7 IAP "credits/tickets" | no MVP, IAP só Remove Ads e Starter Pack com conteúdo fixo e listado; Créditos não se vendem (vender Créditos seria vender dica, isto é, a solução) |
+| §7 rewarded "dobrar" e "caixa de rota" | mantidos, com conteúdo visível antes, id de transação e dentro do teto de 5 por dia |
+| §13/§14 Ads/Analytics sem regra de privacidade | anúncio não personalizado e sem `AD_ID`, receita do DC (`MONETIZACAO.md` §4) e do Little Terminal (LevelPlay 9.6 pelo `Setup`) |
+| §9/§10 "Fragile Week" e "8 propriedades" | DEFERIDO na matriz do contrato até o D7 pedir regra nova |
+| §25 nome | trocar antes de criar o projeto Unity (o appId nasce no `Setup.cs`) |
+
+## 29.4 Nome (decisão do Vinicius)
+
+Candidatos para a checagem do `ip-originality-reviewer` (loja, INPI, USPTO, busca web). **Nenhum foi verificado ainda.**
+
+| Nome | Por quê | Risco a checar |
+|---|---|---|
+| **Hold Up!** | trocadilho com "porão" (hold) e "segura aí"; lê em inglês e espanhol | nome comum, pode ter muitos apps |
+| **Pack & Fly** | diz o core e a recompensa (decolagem) | combinação genérica |
+| **Snug Cargo** | "encaixe justo", o S1 do §27 | pouco conhecido fora do inglês |
+
+Recomendação: mandar os 3 para a checagem e decidir só com o resultado.
+
+## 29.5 O que veio dos outros jogos desde 2026-10-16
+
+- **Little Terminal:** GameCI em todo PR, UGS (Authentication e Cloud Save) e LevelPlay 9.6. Entram na v0.2, não no Gate 0.
+- **Mystic Kitchen (M1):** "pedido só aparece se o solver provar que tem solução" é o mesmo princípio do S1. Nada novo a copiar; confirma o desenho.
+- **Rune Relay:** o exploit do "Recomeçar" nasceu lá; aqui o contador persistente já é regra (§2.1).
